@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext } from "next/types";
+import {type GetServerSidePropsContext } from "next/types";
 import {getSession} from '@auth0/nextjs-auth0'
 export const getServerAuthSession = (ctx: {
   req: GetServerSidePropsContext["req"];

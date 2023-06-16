@@ -12,8 +12,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { prisma } from "~/server/db";
 import { getSession } from "@auth0/nextjs-auth0";
-import { Session } from "@auth0/nextjs-auth0";
-
+import { UserContext } from "@auth0/nextjs-auth0/client";
 /**
  * 1. CONTEXT
  *
@@ -23,7 +22,7 @@ import { Session } from "@auth0/nextjs-auth0";
  */
 
 type CreateContextOptions = {
-    session: Session | null | undefined;
+    session: UserContext | null | undefined;
 };
 
 /**
