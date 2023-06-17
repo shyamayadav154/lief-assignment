@@ -2,7 +2,6 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon, TagIcon, TimerIcon } from "lucide-react";
 import { api, type RouterOutputs } from "~/utils/api";
 import { type Dispatch, type SetStateAction, useState } from "react";
-import { SelectMenu } from "./SelectMenu";
 import {
     type SortByEnum,
     sortByOptions,
@@ -10,12 +9,8 @@ import {
     type Tasks,
 } from "~/utils/sortBy";
 import { ClockIcon } from "@heroicons/react/24/outline";
-import { DatePicker } from "./DatePicker";
-import { priorityOptions } from "./CreateTask";
 import { type Priority } from "@prisma/client";
-import { Button } from "./ui/button";
 import { cn } from "~/lib/utils";
-import { Input } from "./ui/input";
 import { useDebounce } from "react-use";
 import {
     ChevronUpIcon,
@@ -27,7 +22,12 @@ import {
 import { Circle } from "rc-progress";
 import { relativeDay } from "~/utils/helper";
 import { usePomodoroState } from "~/context/global";
-import ResizablePanel from "./ResizablePanel";
+import { SelectMenu } from "~/components/SelectMenu";
+import { Button } from "~/components/ui/button";
+import ResizablePanel from "~/components/ResizablePanel";
+import { Input } from "~/components/ui/input";
+import { DatePicker } from "~/components/DatePicker";
+import { priorityOptions } from "./create-task";
 
 function filterTasks(filterBy: FilterByEnum, tasks: Tasks) {
     if (filterBy === "all") {
@@ -37,7 +37,7 @@ function filterTasks(filterBy: FilterByEnum, tasks: Tasks) {
     } else if (filterBy === "completed") {
         return tasks.filter((task) => task.done);
     } else {
-        throw new Error('Unknown filter');
+        throw new Error("Unknown filter");
     }
 }
 
@@ -79,6 +79,8 @@ function Tasklist() {
     );
 }
 
+export default Tasklist;
+
 type Task = RouterOutputs["task"]["getAll"][number];
 
 const SingleTask = ({ task }: { task: Task }) => {
@@ -97,7 +99,7 @@ const SingleTask = ({ task }: { task: Task }) => {
     const onCheckboxChange = () => {
         toggleStatus.mutate({ taskId: task.id }, {
             onSuccess: () => {
-                void apiContext.task.getAll.invalidate;
+                void apiContext.task.getAll.invalidate();
             },
         });
     };
@@ -370,7 +372,7 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
             taskId: task.id,
         }, {
             onSuccess: () => {
-              void  apiContext.task.getAll.invalidate();
+                void apiContext.task.getAll.invalidate();
             },
             onError(error) {
                 console.log(error);
@@ -391,7 +393,7 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
                 category: category ?? undefined,
             }, {
                 onSuccess: () => {
-                  void  apiContext.task.getAll.invalidate();
+                    void apiContext.task.getAll.invalidate();
                 },
                 onError: () => alert("something went wrong"),
             });
@@ -516,5 +518,3 @@ const FilterButtonGroup = ({ setFilter, filter }: ButtonGroupProps) => {
         </span>
     );
 };
-
-export default Tasklist;

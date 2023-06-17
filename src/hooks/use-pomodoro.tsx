@@ -1,6 +1,17 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
+async function showNotification(message: string) {
+    await Notification.requestPermission(function(result) {
+        if (result === "granted") {
+            new Notification("Pomo-To-Do App", {
+                body: message,
+                icon: "/favicon.ico",
+            });
+        }
+    });
+}
+
 type UsePomodorProps = {
     setTimerTaskId: React.Dispatch<
         React.SetStateAction<string | null>
@@ -12,7 +23,7 @@ function usePomodoro(
     { setTimerTaskId, onTimesUp }: UsePomodorProps,
 ) {
     const [isRunning, setIsRunning] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(25 * 60); // Initial time in seconds
+    const [timeLeft, setTimeLeft] = useState(5); // Initial time in seconds
     const [isBreak, setIsBreak] = useState(false);
     const timerValue = isBreak ? 5 : 25;
     const progressInPercent = ((timerValue * 60 - timeLeft) / (timerValue * 60)) *
@@ -26,7 +37,12 @@ function usePomodoro(
             }, 1000);
         } else if (timeLeft === 0) {
             clearInterval(timer);
-            if (isBreak) return;
+
+            if (isBreak) {
+               void showNotification("Time to work!");
+                return;
+            }
+           void showNotification("Time to take a break!");
             setIsBreak(true);
             restartTimer(5);
             onTimesUp();

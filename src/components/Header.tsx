@@ -40,26 +40,23 @@ const Profile = () => {
     const user = session?.user;
     if (!user) return null;
     return (
-        <>
+        <div className="flex items-center gap-2">
             {user.picture &&
                 (
                     <Image
-                        width={40}
-                        height={40}
+                        width={35}
+                        height={35}
                         className="rounded-full"
                         src={user.picture}
                         alt="profile-pic"
                     />
                 )}
             <div>
-                <div className="">
-                    {session.user?.name}
-                </div>
                 <div>
                     {session.user?.email}
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

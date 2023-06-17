@@ -1,12 +1,12 @@
-import { Button } from "./ui/button";
-import { DatePicker } from "./DatePicker";
-import { SelectMenu } from "./SelectMenu";
+import { Button } from "~/components/ui/button";
 import * as z from "zod";
 import { type FormEvent, useState } from "react";
 import { Priority } from "@prisma/client";
 import { api } from "~/utils/api";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { Input } from "./ui/input";
+import { Input } from "~/components/ui/input";
+import { DatePicker } from "~/components/DatePicker";
+import { SelectMenu } from "~/components/SelectMenu";
 
 export const priorityOptions = [{
     label: "Low",
@@ -84,8 +84,8 @@ function CreateTask() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Add a task..."
             />
-            <div className="flex justify-between items-center">
-                <div className="flex gap-2.5">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2.5">
+                <div className="flex justify-between gap-2.5">
                     <DatePicker
                         onChange={setDueDate}
                         value={dueDate}

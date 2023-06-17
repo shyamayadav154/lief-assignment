@@ -17,7 +17,7 @@ const pwaConfig = {
 const config = {
     reactStrictMode: true,
     images: {
-        domains: ["lh3.googleusercontent.com"],
+        domains: ["lh3.googleusercontent.com","s.gravatar.com"],
     },
     typescript: {
         ignoreBuildErrors: true,
