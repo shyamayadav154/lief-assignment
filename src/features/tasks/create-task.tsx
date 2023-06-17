@@ -7,6 +7,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { Input } from "~/components/ui/input";
 import { DatePicker } from "~/components/DatePicker";
 import { SelectMenu } from "~/components/SelectMenu";
+import { Loader2 } from "lucide-react";
 
 export const priorityOptions = [{
     label: "Low",
@@ -63,7 +64,6 @@ function CreateTask() {
             onSuccess: () => {
                 setTitle("");
                 setDueDate(undefined);
-                setPriority(undefined);
                 void apiContext.task.getAll.invalidate();
             },
         });
@@ -82,7 +82,7 @@ function CreateTask() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Add a task..."
+                placeholder="What needs to be done?"
             />
             <div className="flex flex-col sm:flex-row sm:justify-between gap-2.5">
                 <div className="flex justify-between gap-2.5">
@@ -100,7 +100,11 @@ function CreateTask() {
                         options={priorityOptions}
                     />
                 </div>
-                <Button>Add task</Button>
+                <Button className="" disabled={addTask.isLoading}>
+                    {addTask.isLoading &&
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Add
+                </Button>
             </div>
         </form>
     );

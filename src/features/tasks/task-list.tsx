@@ -1,5 +1,5 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { CalendarIcon, TagIcon, TimerIcon } from "lucide-react";
+import { CalendarIcon, Loader2, TagIcon, TimerIcon } from "lucide-react";
 import { api, type RouterOutputs } from "~/utils/api";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import {
@@ -455,7 +455,14 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
                 onChange={(e) => setDescription(e.target.value)}
             />
             <div className="flex justify-end gap-2.5 mt-2">
-                <Button variant="destructive" onClick={deleteTaskHandler} size="sm">
+                <Button
+                    disabled={deleteTask.isLoading}
+                    variant="destructive"
+                    onClick={deleteTaskHandler}
+                    size="sm"
+                >
+                    {deleteTask.isLoading &&
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Delete
                 </Button>
                 <Button

@@ -23,7 +23,7 @@ function usePomodoro(
     { setTimerTaskId, onTimesUp }: UsePomodorProps,
 ) {
     const [isRunning, setIsRunning] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(5); // Initial time in seconds
+    const [timeLeft, setTimeLeft] = useState(25 * 60); // Initial time in seconds
     const [isBreak, setIsBreak] = useState(false);
     const timerValue = isBreak ? 5 : 25;
     const progressInPercent = ((timerValue * 60 - timeLeft) / (timerValue * 60)) *
@@ -39,10 +39,10 @@ function usePomodoro(
             clearInterval(timer);
 
             if (isBreak) {
-               void showNotification("Time to work!");
+                void showNotification("Time to work!");
                 return;
             }
-           void showNotification("Time to take a break!");
+            void showNotification("Time to take a break!");
             setIsBreak(true);
             restartTimer(5);
             onTimesUp();
