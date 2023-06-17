@@ -1,28 +1,36 @@
-# Create T3 App
-
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-## What's next? How do I make an app with this?
+# Lief Assignment (Pomo To-Do App)
+A web-based to-do list app that implements the Pomodoro Technique, along with an analytics dashboard to track task completion and productivity. 
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Live Version: [Lief assignment](https://lief-assignment.vercel.app/)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
-
+## Tech Stack
 - [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
+- [Auth0](https://auth0.com/)
 - [Prisma](https://prisma.io)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
 
-## Learn More
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+![feature 1](src/assets/crypto-1.gif)
+![feature 1](src/assets/crypto-2.gif)
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## Running locally in development mode
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+From the repo:
 
-## How do I deploy this?
+ 1. Clone the project
+```bash
+git clone https://github.com/shyamayadav154/lief-assignment.git
+```
+2. Install dependencies
+```bash
+npm install
+```
+3. Start devlopment server
+```bash
+npm run dev
+```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
