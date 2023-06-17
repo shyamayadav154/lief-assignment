@@ -1,8 +1,10 @@
 import { type NextPage } from "next";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Head from "next/head";
 import CreateTask from "~/components/CreateTask";
 import Header from "~/components/Header";
 import Tasklist from "~/components/TaskList";
+import Analytics from "~/features/analytics";
 
 const Home: NextPage = () => {
     return (
@@ -14,14 +16,35 @@ const Home: NextPage = () => {
             </Head>
             <main className="sm:max-w-xl    mx-auto ">
                 <Header />
-                <h1 className="text-3xl font-bold">Tasks</h1>
-                <section className="space-y-5">
-                    <CreateTask />
-                    <Tasklist />
-                </section>
+
+                <Tabs defaultValue="tasks" className="mt-5">
+                    <TabsList className="w-full sticky top-0 z-10   border bg-orange-100">
+                        <TabsTrigger className="flex-1" value="tasks">Tasks</TabsTrigger>
+                        <TabsTrigger className="flex-1" value="analytics">
+                            Analytics
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="tasks">
+                        <Tasks />
+                    </TabsContent>
+                    <TabsContent value="analytics">
+                        <Analytics />
+                    </TabsContent>
+                </Tabs>
             </main>
         </>
     );
 };
 
+const Tasks = () => {
+    return (
+        <section>
+            <h1 className="text-3xl font-bold">Tasks</h1>
+            <section className="space-y-5 mt-2.5 ">
+                <CreateTask />
+                <Tasklist />
+            </section>
+        </section>
+    );
+};
 export default Home;

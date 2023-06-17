@@ -18,14 +18,16 @@ enum Priority {
 }
 
 model Task {
-    id          String   @id @default(cuid())
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    completedAt DateTime?
     dueDate     DateTime
     title       String
     description String?
-    done        Boolean  @default(false)
-    tomatoes    Int      @default(0)
-    priority    Priority @default(LOW)
+    done        Boolean   @default(false)
+    tomatoes    Int       @default(0)
+    priority    Priority  @default(LOW)
     userId      String
+    category    String?
 }

@@ -1,33 +1,33 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { addDays, differenceInDays, format, formatRelative } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon, TagIcon, TimerIcon } from "lucide-react";
 import { api, type RouterOutputs } from "~/utils/api";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { SelectMenu } from "./SelectMenu";
 import {
-    SortByEnum,
+    type SortByEnum,
     sortByOptions,
-    sortByPriority,
     sortTasks,
-    Tasks,
+    type Tasks,
 } from "~/utils/sortBy";
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { DatePicker } from "./DatePicker";
 import { priorityOptions } from "./CreateTask";
-import { Priority } from "@prisma/client";
+import { type Priority } from "@prisma/client";
 import { Button } from "./ui/button";
 import { cn } from "~/lib/utils";
 import { Input } from "./ui/input";
 import { useDebounce } from "react-use";
 import {
-    ArrowPathIcon,
+    ChevronUpIcon,
     PauseIcon,
     PlayIcon,
+    StopIcon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
 import { Circle } from "rc-progress";
-import usePomodoro from "~/hooks/use-pomodoro";
 import { relativeDay } from "~/utils/helper";
+import { usePomodoroState } from "~/context/global";
+import ResizablePanel from "./ResizablePanel";
 
 function filterTasks(filterBy: FilterByEnum, tasks: Tasks) {
     if (filterBy === "all") {
@@ -37,7 +37,7 @@ function filterTasks(filterBy: FilterByEnum, tasks: Tasks) {
     } else if (filterBy === "completed") {
         return tasks.filter((task) => task.done);
     } else {
-        throw new Error(`Unknown filterBy: ${filterBy}`);
+        throw new Error('Unknown filter');
     }
 }
 
@@ -84,34 +84,49 @@ type Task = RouterOutputs["task"]["getAll"][number];
 const SingleTask = ({ task }: { task: Task }) => {
     const [isShowMore, setIsShowMore] = useState(false);
     const [isShowTimer, setIsShowTimer] = useState(false);
-    const [isTimerRunning, setIsTimerRunning] = useState(false);
+    const {
+        isTimerRunning,
+        restartTimer,
+        setIsTimerRunning,
+        setTimerTaskId,
+        timerTaskId,
+    } = usePomodoroState();
     const toggleStatus = api.task.toggleStatus.useMutation();
-    const updateTask = api.task.update.useMutation();
     const apiContext = api.useContext();
 
-    const increasePomodoro = () => {
-        updateTask.mutate({
-            taskId: task.id,
-            tomatoes: task.tomatoes + 1,
-        }, {
+    const onCheckboxChange = () => {
+        toggleStatus.mutate({ taskId: task.id }, {
             onSuccess: () => {
-                apiContext.task.getAll.invalidate();
-            },
-            onError: (error) => {
-                console.log(error);
-                alert("something went wrong");
+                void apiContext.task.getAll.invalidate;
             },
         });
     };
-    const onCheckboxChange = () => {
-        toggleStatus.mutate({ taskId: task.id });
-    };
     const onPlayClick = () => {
+        setIsShowTimer(!isShowTimer);
+        setIsShowMore(false);
+
+        if (timerTaskId === task.id) {
+            setIsShowTimer(true);
+            return;
+        }
+
         if (!isTimerRunning) {
             setIsTimerRunning(true);
+            setTimerTaskId(task.id);
+            return;
         }
-        setIsShowMore(false);
-        setIsShowTimer(!isShowTimer);
+
+        if (isTimerRunning) {
+            if (timerTaskId === task.id) {
+                // setIsTimerRunning(false);
+                // setTimerTaskId(null);
+            } else {
+                setIsTimerRunning(true);
+                setTimerTaskId(task.id);
+                restartTimer(25);
+            }
+            return;
+        }
     };
     const closeTaskDetails = () => setIsShowMore(false);
     const openTaskDetails = () => {
@@ -126,124 +141,196 @@ const SingleTask = ({ task }: { task: Task }) => {
         isShowMore,
         isTimerRunning,
     });
+
+    const hasTimerTaskId = timerTaskId === task.id;
+    const showPomodoroTimer = (!isShowMore && isShowTimer) && hasTimerTaskId;
+
     return (
-        <li className="border flex gap-2.5 items-start rounded  p-2 bg-gray-50">
-            <section className="mt-1.5">
-                <input
-                    onChange={onCheckboxChange}
-                    className="h-4 w-4"
-                    type="checkbox"
-                    defaultChecked={task.done}
-                />
-            </section>
+        <ResizablePanel>
+            <li className="border w-full flex gap-2.5 items-start rounded  p-2 bg-gray-50">
+                <section className="mt-1.5">
+                    <input
+                        onChange={onCheckboxChange}
+                        className="h-4 w-4"
+                        type="checkbox"
+                        defaultChecked={task.done}
+                    />
+                </section>
 
-            <section
-                onClick={openTaskDetails}
-                className="cursor-pointer flex-1 select-none"
-            >
-                {!isShowMore && (
-                    <article>
-                        <div className="text-xl">
-                            {task.title}
-                        </div>
-                        <div className="flex gap-2">
-                            <div className="text-xs p-1 capitalize font-medium  border">
-                                <ExclamationTriangleIcon className="h-3 w-3 inline mr-2" />
-                                {task.priority?.toLowerCase()}
+                <section
+                    onClick={openTaskDetails}
+                    className="cursor-pointer flex-1 select-none"
+                >
+                    {!isShowMore && (
+                        <article>
+                            <div className="text-xl">
+                                {task.title}
                             </div>
-                            <div className="text-xs flex items-center font-medium p-1 border">
-                                <CalendarIcon className="h-3 w-3 inline mr-2" />
-                                {relativeDay(task.dueDate)}
+                            <div className="flex gap-2">
+                                <div className="text-xs p-1 capitalize font-medium  border">
+                                    <ExclamationTriangleIcon className="h-3 w-3 inline mr-2" />
+                                    {task.priority?.toLowerCase()}
+                                </div>
+                                <div className="text-xs flex items-center font-medium p-1 border">
+                                    <CalendarIcon className="h-3 w-3 inline mr-2" />
+                                    {relativeDay(task.dueDate)}
+                                </div>
+                                <div className="text-xs flex items-center font-medium p-1 border">
+                                    <TimerIcon className="h-3 w-3 inline mr-2" />
+                                    {task.tomatoes}
+                                </div>
+                                {task.category && (
+                                    <div className="text-xs flex items-center font-medium p-1 border">
+                                        <TagIcon className="h-3 w-3 inline mr-2" />
+                                        {task.category}
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    </article>
-                )}
-                {isShowMore && (
-                    <TaskDetails closeTaskDetails={closeTaskDetails} task={task} />
-                )}
+                        </article>
+                    )}
+                    {isShowMore && (
+                        <TaskDetails closeTaskDetails={closeTaskDetails} task={task} />
+                    )}
 
-                {(isShowTimer || isTimerRunning) && (
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        className={cn(
-                            { "h-0 w-0 overflow-hidden": !isShowTimer && isTimerRunning },
+                    {showPomodoroTimer && (
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className={cn(
+                                { "h-0 w-0 overflow-hidden": !isShowTimer && isTimerRunning },
+                            )}
+                        >
+                            <PomodorTimer
+                                hideTimer={() => setIsShowTimer(false)}
+                            />
+                        </div>
+                    )}
+                </section>
+                <section>
+                    {!isShowTimer &&
+                        (
+                            <Button
+                                onClick={onPlayClick}
+                                className="p-2 border bg-orange-100 rounded-full hover:bg-orange-200"
+                            >
+                                {hasTimerTaskId
+                                    ? <ClockIcon className="h-6 w-6 text-orange-500" />
+                                    : <PlayIcon className="h-6 w-6 text-orange-500" />}
+                            </Button>
                         )}
-                    >
-                        <PomodorTimer
-                            isRunning={isTimerRunning}
-                            onTimesUp={increasePomodoro}
-                            setIsRunning={setIsTimerRunning}
-                            hideTimer={() => setIsShowTimer(false)}
-                        />
-                    </div>
-                )}
-            </section>
-            <section>
-                {!isShowTimer && (
-                    <Button
-                        onClick={onPlayClick}
-                        className="p-2 border bg-orange-100 rounded-full hover:bg-orange-200"
-                    >
-                        {isTimerRunning
-                            ? <ClockIcon className="h-6 w-6 text-orange-500" />
-                            : <PlayIcon className="h-6 w-6 text-orange-500" />}
-                    </Button>
-                )}
-            </section>
-        </li>
+                </section>
+            </li>
+        </ResizablePanel>
     );
 };
 
 type PomodorTimerProps = {
-    isRunning: boolean;
-    setIsRunning: React.Dispatch<React.SetStateAction<boolean>>;
     hideTimer: () => void;
-    onTimesUp: () => void;
 };
 
 const PomodorTimer = (
-    { isRunning, setIsRunning, hideTimer, onTimesUp }: PomodorTimerProps,
+    { hideTimer }: PomodorTimerProps,
 ) => {
     const {
+        isTimerRunning,
+        isBreak,
+        setIsBreak,
         minutes,
         seconds,
         resetTimer,
         startTimer,
+        pauseTimer,
         stopTimer,
-        progressInPercent,
-    } = usePomodoro({ isRunning, setIsRunning, onTimesUp });
+        restartTimer,
+        timeLeft,
+    } = usePomodoroState();
+
+    const onPomoDoroClick = () => {
+        if (!isBreak) return;
+        setIsBreak(false);
+        restartTimer(25);
+    };
+
+    const onBreakClick = () => {
+        if (isBreak) return;
+        setIsBreak(true);
+        restartTimer(5);
+    };
+    const t = isBreak ? 5 : 25;
+
+    const progressInPercent = ((t * 60 - timeLeft) / (t * 60)) * 100;
 
     return (
         <article
-            className="bg-white p-2 rounded mt-2.5"
+            className="bg-white p-2 sm:flex relative z-10 rounded mt-2.5"
             onClick={(e) => e.stopPropagation()}
         >
-            <div className="max-w-[12.5rem] relative mx-auto">
-                <span className="absolute inset-0 grid place-content-center text-3xl font-semibold">
-                    {minutes < 10 ? `0${minutes}` : minutes}:{seconds < 10
-                        ? `0${seconds}`
-                        : seconds}
-                </span>
-                <Circle
-                    percent={progressInPercent}
-                    strokeWidth={4}
-                    strokeColor="#fb923c"
-                    trailWidth={4}
-                    trailColor="#fff7ed"
-                />
+            <div className="w-[12.5rem] relative mx-auto  p-1 rounded">
+                <div className="text-xs divide-x-2  mb-5 uppercase font-semibold">
+                    <span
+                        onClick={onPomoDoroClick}
+                        className={cn("px-2.5 text-gray-500", {
+                            "text-orange-500": !isBreak,
+                        })}
+                    >
+                        Pomodoro
+                    </span>
+
+                    <span
+                        onClick={onBreakClick}
+                        className={cn("px-2.5 text-gray-500", {
+                            "text-orange-500": isBreak,
+                        })}
+                    >
+                        Short Break
+                    </span>
+                </div>
+
+                <div className="relative">
+                    <span className="absolute inset-0 grid place-content-center text-3xl font-semibold">
+                        {minutes < 10 ? `0${minutes}` : minutes}:{seconds < 10
+                            ? `0${seconds}`
+                            : seconds}
+                    </span>
+                    <Circle
+                        percent={progressInPercent}
+                        strokeWidth={4}
+                        strokeColor="#fb923c"
+                        trailWidth={4}
+                        trailColor="#fff7ed"
+                    />
+                </div>
             </div>
-            <div className="flex justify-center mt-5 gap-2.5">
-                <Button
-                    onClick={hideTimer}
-                    className="p-2 rounded-full bg-orange-100 hover:bg-orange-200"
-                >
-                    <XMarkIcon className="w-6 h-6 text-orange-500" />
-                </Button>
-                {isRunning
+            <div className="flex flex-col w-[140px] mx-auto justify-center mt-5 gap-2.5">
+                <div className="flex gap-2 5 justify-center">
+                    <Button
+                        onClick={resetTimer}
+                        className="p-2 rounded-full bg-orange-100 hover:bg-orange-200"
+                    >
+                        <StopIcon className="w-6 h-6 text-orange-500" />
+                    </Button>
+
+                    <Button
+                        onClick={() => {
+                            hideTimer();
+                            stopTimer();
+                        }}
+                        className="p-2 rounded-full bg-orange-100 hover:bg-orange-200"
+                    >
+                        <XMarkIcon className="w-6 h-6 text-orange-500" />
+                    </Button>
+
+                    <Button
+                        onClick={hideTimer}
+                        className="p-2 rounded-full bg-orange-100 hover:bg-orange-200"
+                    >
+                        <ChevronUpIcon className="w-6 h-6 text-orange-500" />
+                    </Button>
+                </div>
+                {isTimerRunning
                     ? (
                         <Button
                             className="bg-orange-500 p-2 flex-shrink-0 rounded-full hover:bg-orange-500/80"
-                            onClick={stopTimer}
+                            onClick={pauseTimer}
                         >
                             <PauseIcon className="h-6 w-6 text-white" />
                         </Button>
@@ -256,12 +343,6 @@ const PomodorTimer = (
                             <PlayIcon className="h-6 w-6 text-white" />
                         </Button>
                     )}
-                <Button
-                    onClick={resetTimer}
-                    className="p-2 rounded-full bg-orange-100 hover:bg-orange-200"
-                >
-                    <ArrowPathIcon className="w-6 h-6 text-orange-500" />
-                </Button>
             </div>
         </article>
     );
@@ -277,6 +358,7 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
     const [dueDate, setDueDate] = useState(task.dueDate);
     const [priority, setPriority] = useState<Priority>(task.priority);
     const [description, setDescription] = useState(task.description ?? "");
+    const [category, setCategory] = useState(task.category ?? "");
     const updateTask = api.task.update.useMutation();
     const deleteTask = api.task.delete.useMutation();
     const apiContext = api.useContext();
@@ -288,9 +370,9 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
             taskId: task.id,
         }, {
             onSuccess: () => {
-                apiContext.task.getAll.invalidate();
+              void  apiContext.task.getAll.invalidate();
             },
-            onError(error, variables, context) {
+            onError(error) {
                 console.log(error);
                 alert("something went wrong");
             },
@@ -306,15 +388,16 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
                 description,
                 dueDate,
                 priority,
+                category: category ?? undefined,
             }, {
                 onSuccess: () => {
-                    apiContext.task.getAll.invalidate();
+                  void  apiContext.task.getAll.invalidate();
                 },
                 onError: () => alert("something went wrong"),
             });
         },
         300,
-        [dueDate, title, priority, description],
+        [dueDate, title, priority, description, category],
     );
 
     return (
@@ -324,7 +407,7 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
         >
             <div className="bg-white mb-2">
                 <Input
-                    value={task.title}
+                    value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     type="text"
                     className="text-xl"
@@ -351,10 +434,16 @@ const TaskDetails = ({ task, closeTaskDetails }: TaskDetailsProps) => {
                     />
                 </span>
                 <span className="text-gray-500">Pomodoro</span>
-                <span>
-                    <ClockIcon className="h-4 w-4 inline mr-2" />
+                <span className="flex items-center">
+                    <TimerIcon className="h-4 w-4 inline mr-2" />
                     {task.tomatoes}
                 </span>
+                <span className="text-gray-500">Category</span>
+                <Input
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    type="text"
+                />
             </div>
             <textarea
                 rows={4}

@@ -1,25 +1,38 @@
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 type UsePomodorProps = {
-    isRunning: boolean;
-    setIsRunning: React.Dispatch<React.SetStateAction<boolean>>;
+    setTimerTaskId: React.Dispatch<
+        React.SetStateAction<string | null>
+    >;
     onTimesUp: () => void;
+    taskId: string | null;
 };
-function usePomodoro({ isRunning, setIsRunning, onTimesUp }: UsePomodorProps) {
+function usePomodoro(
+    { setTimerTaskId, onTimesUp }: UsePomodorProps,
+) {
+    const [isRunning, setIsRunning] = useState(false);
     const [timeLeft, setTimeLeft] = useState(25 * 60); // Initial time in seconds
+    const [isBreak, setIsBreak] = useState(false);
+    const timerValue = isBreak ? 5 : 25;
+    const progressInPercent = ((timerValue * 60 - timeLeft) / (timerValue * 60)) *
+        100;
 
     useEffect(() => {
-        let timer;
+        let timer: string | number | NodeJS.Timeout | undefined;
         if (isRunning && timeLeft > 0) {
             timer = setInterval(() => {
                 setTimeLeft((prevTime) => prevTime - 1);
             }, 1000);
         } else if (timeLeft === 0) {
-            onTimesUp();
             clearInterval(timer);
+            if (isBreak) return;
+            setIsBreak(true);
+            restartTimer(5);
+            onTimesUp();
         }
-        return () => clearInterval(timer!);
-    }, [isRunning, timeLeft]);
+        return () => clearInterval(timer);
+    }, [isRunning, timeLeft, isBreak, onTimesUp]);
 
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -28,23 +41,46 @@ function usePomodoro({ isRunning, setIsRunning, onTimesUp }: UsePomodorProps) {
         setIsRunning(true);
     };
 
-    const stopTimer = () => {
+    const pauseTimer = () => {
         setIsRunning(false);
+    };
+
+    const stopTimer = () => {
+        setTimeLeft(25 * 60);
+        setTimerTaskId(null);
+        setIsBreak(false);
     };
 
     const resetTimer = () => {
-        setTimeLeft(25 * 60);
+        setTimeLeft(timerValue * 60);
         setIsRunning(false);
     };
-    const progressInPercent = ((25 * 60 - timeLeft) / (25 * 60)) * 100;
+
+    const restartTimer = (value: number | undefined) => {
+        if (!value) {
+            setTimeLeft(25 * 60);
+            setIsRunning(true);
+        }
+        if (value) {
+            setTimeLeft(value * 60);
+            setIsRunning(true);
+        }
+    };
 
     return {
+        isRunning,
+        setIsRunning,
+        isBreak,
+        setIsBreak,
         progressInPercent,
+        restartTimer,
         startTimer,
+        pauseTimer,
         stopTimer,
         resetTimer,
         minutes,
         seconds,
+        timeLeft,
     };
 }
 

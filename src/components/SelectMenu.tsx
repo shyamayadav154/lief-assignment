@@ -9,7 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Priority } from "@prisma/client";
+import { type Priority } from "@prisma/client";
 
 type Option = {
     label: string;

@@ -2,6 +2,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 function Header() {
     const session = useUser();
@@ -42,7 +43,7 @@ const Profile = () => {
         <>
             {user.picture &&
                 (
-                    <img
+                    <Image
                         width={40}
                         height={40}
                         className="rounded-full"

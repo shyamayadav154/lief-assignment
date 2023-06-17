@@ -1,4 +1,4 @@
-import { RouterOutputs } from "./api";
+import { type RouterOutputs } from "./api";
 
 export const sortByOptions = [
     {
@@ -44,7 +44,7 @@ export function sortByDueDate(tasks: Tasks) {
 }
 
 export function sortByCompleted(tasks: Tasks) {
-    return tasks.sort((taskA, taskB) => {
+    return tasks.sort((taskA) => {
         if (taskA.done) {
             return 1;
         } else {
@@ -55,7 +55,7 @@ export function sortByCompleted(tasks: Tasks) {
 
 export function sortTasks(sortBy: SortByEnum, tasks: Tasks) {
     if (!sortBy || sortBy === "none") return tasks;
-    let tasksCopy = [...tasks];
+    const tasksCopy = [...tasks];
     if (sortBy === "priority") return sortByPriority(tasksCopy);
     if (sortBy === "date") return sortByDueDate(tasksCopy);
     if (sortBy === "completed") return sortByCompleted(tasksCopy);

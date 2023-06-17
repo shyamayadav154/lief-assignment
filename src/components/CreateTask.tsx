@@ -1,11 +1,8 @@
-import { PlusIcon } from "@heroicons/react/20/solid";
 import { Button } from "./ui/button";
 import { DatePicker } from "./DatePicker";
 import { SelectMenu } from "./SelectMenu";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { FormEvent, FormEventHandler, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { Priority } from "@prisma/client";
 import { api } from "~/utils/api";
 import { useUser } from "@auth0/nextjs-auth0/client";
@@ -33,7 +30,7 @@ const taskSchema = z.object({
 function CreateTask() {
     const [title, setTitle] = useState("");
     const [dueDate, setDueDate] = useState<Date | undefined>();
-    const [priority, setPriority] = useState<Priority>("LOW");
+    const [priority, setPriority] = useState<Priority | undefined>(undefined);
     const apiContext = api.useContext();
     const addTask = api.task.create.useMutation();
     const user = useUser();
@@ -44,12 +41,17 @@ function CreateTask() {
     const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        if (!title || !dueDate || !priority) return alert("Please fill all fields");
+
         const parsedDate = taskSchema.safeParse({
             title,
             dueDate,
             priority,
         });
 
+        console.log({
+            parsedDate,
+        });
         if (!parsedDate.success) return;
         if (!dueDate) return;
 
@@ -61,8 +63,8 @@ function CreateTask() {
             onSuccess: () => {
                 setTitle("");
                 setDueDate(undefined);
-                setPriority("LOW");
-                apiContext.task.getAll.invalidate();
+                setPriority(undefined);
+                void apiContext.task.getAll.invalidate();
             },
         });
     };
@@ -91,6 +93,7 @@ function CreateTask() {
                         label="Due date"
                     />
                     <SelectMenu
+                        value={priority}
                         onChange={onSelectMenuChange}
                         name="priority"
                         label="Priority"

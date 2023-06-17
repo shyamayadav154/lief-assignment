@@ -11,8 +11,7 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { prisma } from "~/server/db";
-import { getSession } from "@auth0/nextjs-auth0";
-import { UserContext } from "@auth0/nextjs-auth0/client";
+import { getSession, type Session } from "@auth0/nextjs-auth0";
 /**
  * 1. CONTEXT
  *
@@ -22,7 +21,7 @@ import { UserContext } from "@auth0/nextjs-auth0/client";
  */
 
 type CreateContextOptions = {
-    session: UserContext | null | undefined;
+    session: Session | null | undefined;
 };
 
 /**

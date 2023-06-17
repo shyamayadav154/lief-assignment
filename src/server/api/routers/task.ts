@@ -31,7 +31,7 @@ export const taskRouter = createTRPCRouter({
         dueDate: z.date().optional(),
         description: z.string().optional(),
         priority: z.nativeEnum(Priority).optional(),
-        tomatoes: z.number().optional(),
+        category: z.string().optional(),
     })).mutation(async ({ ctx, input }) => {
         const task = await ctx.prisma.task.findUnique({
             where: {
@@ -53,6 +53,32 @@ export const taskRouter = createTRPCRouter({
                 dueDate: input.dueDate,
                 description: input.description,
                 priority: input.priority,
+                category: input.category,
+            },
+        });
+    }),
+    addTomato: protectedProcedure.input(z.object({
+        taskId: z.string(),
+    })).mutation(async ({ ctx, input }) => {
+        const task = await ctx.prisma.task.findUnique({
+            where: {
+                id: input.taskId,
+            },
+        });
+
+        if (!task) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Task not found",
+            });
+        }
+
+        return ctx.prisma.task.update({
+            where: {
+                id: input.taskId,
+            },
+            data: {
+                tomatoes: task.tomatoes + 1,
             },
         });
     }),
@@ -104,6 +130,7 @@ export const taskRouter = createTRPCRouter({
             },
         });
 
+        console.log("....task....", task);
         if (!task) {
             throw new TRPCError({
                 code: "NOT_FOUND",
@@ -114,6 +141,7 @@ export const taskRouter = createTRPCRouter({
             await ctx.prisma.task.update({
                 data: {
                     done: true,
+                    completedAt: new Date(),
                 },
                 where: {
                     id: input.taskId,
@@ -124,6 +152,7 @@ export const taskRouter = createTRPCRouter({
             await ctx.prisma.task.update({
                 data: {
                     done: false,
+                    completedAt: null,
                 },
                 where: {
                     id: input.taskId,
