@@ -36,9 +36,6 @@ function CreateTask() {
     const addTask = api.task.create.useMutation();
     const user = useUser();
 
-    if (!user) return null;
-    if (user.isLoading) return <div>Loading...</div>;
-
     const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -72,6 +69,8 @@ function CreateTask() {
     const onSelectMenuChange = (value: string) => {
         setPriority(value as Priority);
     };
+
+    if (!user) return null;
 
     return (
         <form

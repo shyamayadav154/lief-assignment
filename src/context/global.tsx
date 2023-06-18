@@ -1,31 +1,19 @@
-import {
-    createContext,
-    type Dispatch,
-    type ReactNode,
-    type SetStateAction,
-    useContext,
-    useState,
-    type Context,
-} from "react";
-import usePomodoro from "~/hooks/use-pomodoro";
+import { type Context, createContext, type ReactNode, useContext } from "react";
 import { api } from "~/utils/api";
+import usePomo, { type SessionType } from "~/hooks/use-pomo";
 
 type PomodoroContextType = {
-    isBreak: boolean;
-    setIsBreak: Dispatch<SetStateAction<boolean>>;
+    sessionType: SessionType;
     isTimerRunning: boolean;
-    setIsTimerRunning: Dispatch<SetStateAction<boolean>>;
     timerTaskId: string | null;
-    setTimerTaskId: Dispatch<SetStateAction<string | null>>;
-    minutes: number;
-    seconds: number;
-    resetTimer: () => void;
-    timeLeft: number;
-    startTimer: () => void;
-    stopTimer: () => void;
-    restartTimer: (value: number | undefined) => void;
-    pauseTimer: () => void;
-    progressInPercent: number;
+    reset: () => void;
+    resume: () => void;
+    formatTime: (time: number) => string;
+    time: number;
+    start: (taskId: string) => void;
+    stop: () => void;
+    pause: () => void;
+    progress: number;
 };
 
 export const PomodoroContext = createContext<PomodoroContextType | null>(null);
@@ -33,8 +21,6 @@ export const PomodoroContext = createContext<PomodoroContextType | null>(null);
 export const PomodoroContextProvider = (
     { children }: { children: ReactNode },
 ) => {
-    // const [isTimerRunning, setIsTimerRunning] = useState(false);
-    const [timerTaskId, setTimerTaskId] = useState<string | null>(null);
     const addTomatoApi = api.task.addTomato.useMutation();
     const apiContext = api.useContext();
 
@@ -54,41 +40,31 @@ export const PomodoroContextProvider = (
     };
 
     const {
+        formatTime,
         isRunning,
-        setIsRunning,
-        isBreak,
-        setIsBreak,
-        timeLeft,
-        minutes,
-        seconds,
-        resetTimer,
-        startTimer,
-        stopTimer,
-        pauseTimer,
-        restartTimer,
-        progressInPercent,
-    } = usePomodoro({
-        setTimerTaskId,
-        onTimesUp,
-        taskId: timerTaskId,
-    });
+        time,
+        start,
+        stop,
+        reset,
+        resume,
+        pause,
+        timerTaskId,
+        sessionType,
+        progress,
+    } = usePomo({ onTimesUp });
 
     const contextValue: PomodoroContextType = {
-        isBreak,
-        setIsBreak,
-        timeLeft,
+        stop,
+        resume,
+        reset,
+        pause,
+        progress,
+        start,
+        formatTime,
+        time,
+        sessionType,
         timerTaskId,
-        setTimerTaskId,
         isTimerRunning: isRunning,
-        setIsTimerRunning: setIsRunning,
-        minutes,
-        seconds,
-        resetTimer,
-        restartTimer,
-        pauseTimer,
-        startTimer,
-        stopTimer,
-        progressInPercent,
     };
     return (
         <PomodoroContext.Provider
@@ -100,4 +76,6 @@ export const PomodoroContextProvider = (
 };
 
 export const usePomodoroState = () =>
-    useContext<PomodoroContextType>(PomodoroContext as unknown as Context<PomodoroContextType>);
+    useContext<PomodoroContextType>(
+        PomodoroContext as unknown as Context<PomodoroContextType>,
+    );

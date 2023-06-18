@@ -4,10 +4,7 @@ import { api, type RouterOutputs } from "~/utils/api";
 import { useState } from "react";
 
 import { ClockIcon } from "@heroicons/react/24/outline";
-import { cn } from "~/lib/utils";
-import {
-    PlayIcon,
-} from "@heroicons/react/20/solid";
+import { PlayIcon } from "@heroicons/react/20/solid";
 import { relativeDay } from "~/utils/helper";
 import { usePomodoroState } from "~/context/global";
 import { Button } from "~/components/ui/button";
@@ -18,103 +15,90 @@ import { PomodorTimer } from "./pomodoro-timer";
 type Task = RouterOutputs["task"]["getAll"][number];
 
 export const SingleTask = ({ task }: { task: Task }) => {
-    const [isShowMore, setIsShowMore] = useState(false);
+    const [isEditTask, setIsEditTask] = useState(false);
     const [isShowTimer, setIsShowTimer] = useState(false);
     const {
         isTimerRunning,
-        restartTimer,
-        setIsTimerRunning,
-        setTimerTaskId,
         timerTaskId,
+        start,
+        reset,
     } = usePomodoroState();
 
     const onPlayClick = () => {
         setIsShowTimer(!isShowTimer);
-        setIsShowMore(false);
+        setIsEditTask(false);
+        const isCurrentTask = timerTaskId === task.id;
 
-        if (!isTimerRunning) {
-            setIsTimerRunning(true);
-            setTimerTaskId(task.id);
-            return;
+        if (!isTimerRunning && !isCurrentTask) {
+            start(task.id);
         }
 
-        if (isTimerRunning) {
-            if (timerTaskId === task.id) {
-                setIsShowTimer(true);
-            } else {
-                setIsTimerRunning(true);
-                setIsShowTimer(true);
-                setTimerTaskId(task.id);
-                restartTimer(25);
-            }
-            return;
+        if (isTimerRunning && !isCurrentTask) {
+            reset();
+            start(task.id);
         }
+
     };
-    const closeTaskDetails = () => setIsShowMore(false);
+    const closeTaskDetails = () => setIsEditTask(false);
     const openTaskDetails = () => {
         if (isShowTimer) {
             setIsShowTimer(false);
         }
-        setIsShowMore(true);
+        setIsEditTask(true);
     };
 
     const hasTimerTaskId = timerTaskId === task.id;
-    const showPomodoroTimer = (!isShowMore && isShowTimer) && hasTimerTaskId;
+    const showPomodoroTimer = (!isEditTask && isShowTimer) && hasTimerTaskId;
 
     return (
         <ResizablePanel>
-            <li className="border w-full flex gap-2.5 items-start rounded  p-2 bg-gray-50">
+            <li className="border w-full flex gap-2.5 items-start rounded  p-2 bg-zinc-50">
                 <TaskCheckBox taskId={task.id} isChecked={task.done} />
                 <section
                     onClick={openTaskDetails}
                     className="cursor-pointer flex-1 select-none"
                 >
-                    {!isShowMore && (
+                    {!isEditTask && (
                         <article>
-                            <div className="text-xl">
+                            <div className="text-lg">
                                 {task.title}
                             </div>
-                            <div className="flex gap-2">
-                                <div className="text-xs p-1 capitalize font-medium  border">
-                                    <ExclamationTriangleIcon className="h-3 w-3 inline mr-2" />
-                                    {task.priority?.toLowerCase()}
-                                </div>
-                                <div className="text-xs flex items-center font-medium p-1 border">
-                                    <CalendarIcon className="h-3 w-3 inline mr-2" />
-                                    {relativeDay(task.dueDate)}
-                                </div>
-                                <div className="text-xs flex items-center font-medium p-1 border">
-                                    <TimerIcon className="h-3 w-3 inline mr-2" />
-                                    {task.tomatoes}
-                                </div>
-                                {task.category && (
-                                    <div className="text-xs flex items-center font-medium p-1 border">
-                                        <TagIcon className="h-3 w-3 inline mr-2" />
-                                        {task.category}
+                            {!isShowTimer && (
+                                <div className="flex gap-2">
+                                    <div className="text-xs p-1 capitalize font-medium  border">
+                                        <ExclamationTriangleIcon className="h-3 w-3 inline mr-2" />
+                                        {task.priority?.toLowerCase()}
                                     </div>
-                                )}
-                            </div>
+                                    <div className="text-xs flex items-center font-medium p-1 border">
+                                        <CalendarIcon className="h-3 w-3 inline mr-2" />
+                                        {relativeDay(task.dueDate)}
+                                    </div>
+                                    <div className="text-xs flex items-center font-medium p-1 border">
+                                        <TimerIcon className="h-3 w-3 inline mr-2" />
+                                        {task.tomatoes}
+                                    </div>
+                                    {task.category && (
+                                        <div className="text-xs flex items-center font-medium p-1 border">
+                                            <TagIcon className="h-3 w-3 inline mr-2" />
+                                            {task.category}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </article>
                     )}
-                    {isShowMore && (
+                    {isEditTask && (
                         <EditTask closeTaskDetails={closeTaskDetails} task={task} />
                     )}
 
                     {showPomodoroTimer && (
-                        <div
-                            onClick={(e) => e.stopPropagation()}
-                            className={cn(
-                                { "h-0 w-0 overflow-hidden": !isShowTimer && isTimerRunning },
-                            )}
-                        >
-                            <PomodorTimer
-                                hideTimer={() => setIsShowTimer(false)}
-                            />
-                        </div>
+                        <PomodorTimer
+                            hideTimer={() => setIsShowTimer(false)}
+                        />
                     )}
                 </section>
                 <section>
-                    { (!isShowTimer || task.id !== timerTaskId) &&
+                    {(!isShowTimer || task.id !== timerTaskId) &&
                         (
                             <Button
                                 onClick={onPlayClick}

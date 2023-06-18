@@ -7,9 +7,8 @@ import Image from "next/image";
 function Header() {
     const session = useUser();
     const user = session.user;
-    console.log(user);
-    if (session.isLoading) return <div>Loading...</div>;
     if (session.error) return <div>{session.error.message}</div>;
+    
 
     return (
         <header className="shadow bg-white items-center p-2 mt-1 rounded    flex justify-between">

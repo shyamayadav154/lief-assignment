@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { relativeDay } from "~/utils/helper";
 
 export function DatePicker({ label = "Select a date", ...props }) {
   const date = props?.value;
@@ -23,12 +23,12 @@ export function DatePicker({ label = "Select a date", ...props }) {
         <Button
           variant={"outline"}
           className={cn(
-            "w-[190px] justify-start text-left font-normal",
+            "w-[130px] justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>{label}</span>}
+          {date ? relativeDay(date) : <span>{label}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

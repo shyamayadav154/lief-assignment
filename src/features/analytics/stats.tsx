@@ -40,7 +40,7 @@ export const TodayStats = ({ tasks }: { tasks: Task[] }) => {
     );
 
     const pomoTime = totalTomatoes * 30;
-    const pomoTimeInHours = pomoTime / 60;
+    const pomoTimeInHours = Math.floor(pomoTime / 60);
     const pomoTimeInMinutes = pomoTime % 60;
 
     console.log({
@@ -85,7 +85,7 @@ export const MonthStats = ({ tasks }: { tasks: Task[] }) => {
     );
 
     const pomoTime = totalTomatoes * 30;
-    const pomoTimeInHours = pomoTime / 60;
+    const pomoTimeInHours = Math.floor(pomoTime / 60);
     const pomoTimeInMinutes = pomoTime % 60;
 
     return (
@@ -125,7 +125,7 @@ export const WeekStats = ({ tasks }: { tasks: Task[] }) => {
     );
 
     const pomoTime = totalTomatoes * 30;
-    const pomoTimeInHours = pomoTime / 60;
+    const pomoTimeInHours = Math.floor(pomoTime / 60);
     const pomoTimeInMinutes = pomoTime % 60;
 
     return (

@@ -11,6 +11,6 @@ export function relativeDay(date: Date | null) {
     } else if (difference === -1) {
         return "Yesterday";
     } else {
-        return format(date, "MMM d");
+        return format(date, "d MMMM");
     }
 }
