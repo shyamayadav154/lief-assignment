@@ -31,7 +31,7 @@ const Home: NextPage = () => {
                 <Header />
 
                 <Tabs defaultValue="tasks" className="m-5 mx-2.5 sm:mx-0">
-                    <TabsList className="w-full mb-2.5 sticky top-5 z-[100] shadow-sm   border bg-orange-100">
+                    <TabsList className="w-full mb-2.5 sticky top-5 z-10 shadow-sm   border bg-orange-100">
                         <TabsTrigger className="flex-1" value="tasks">Tasks</TabsTrigger>
                         <TabsTrigger className="flex-1" value="analytics">
                             Analytics
