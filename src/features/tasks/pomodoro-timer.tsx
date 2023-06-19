@@ -31,7 +31,7 @@ export const PomodorTimer = (
 
     return (
         <article
-            className="bg-white p-2 sm:flex relative z-10 rounded mt-2.5 cursor-auto"
+            className="bg-white p-2 sm:flex  rounded mt-2.5 cursor-auto"
             onClick={(e) => e.stopPropagation()}
         >
             <div className="flex flex-col items-center  relative mx-auto  p-1 rounded">
