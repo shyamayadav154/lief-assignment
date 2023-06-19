@@ -98,11 +98,11 @@ export const SingleTask = ({ task }: { task: Task }) => {
                         (
                             <Button
                                 onClick={onPlayClick}
-                                className="p-2 border bg-orange-50 rounded-full hover:bg-orange-100"
+                                className="p-2 border bg-orange-50 flex-shrink-0 aspect-square rounded-full hover:bg-orange-100"
                             >
                                 {hasTimerTaskId
-                                    ? <ClockIcon className="h-6 w-6 text-orange-400" />
-                                    : <PlayIcon className="h-6 w-6 text-orange-400" />}
+                                    ? <ClockIcon className="h-5 w-5 text-orange-400" />
+                                    : <PlayIcon className="h-5 w-5 text-orange-400" />}
                             </Button>
                         )}
                 </section>

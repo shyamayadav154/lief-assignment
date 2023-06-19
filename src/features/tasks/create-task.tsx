@@ -36,6 +36,8 @@ function CreateTask() {
     const addTask = api.task.create.useMutation();
     const user = useUser();
 
+    const isButtonDisabled = addTask.status === "loading" || !title || !dueDate || !priority;
+
     const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -99,7 +101,7 @@ function CreateTask() {
                         options={priorityOptions}
                     />
                 </div>
-                <Button className="" disabled={addTask.isLoading}>
+                <Button className="" disabled={isButtonDisabled}>
                     {addTask.isLoading &&
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Add
