@@ -24,7 +24,7 @@ export const PomodoroContextProvider = (
     const addTomatoApi = api.task.addTomato.useMutation();
     const apiContext = api.useContext();
 
-    const onTimesUp = () => {
+    const onComplete = () => {
         if (!timerTaskId) return alert("task id not found");
         addTomatoApi.mutate({
             taskId: timerTaskId,
@@ -51,7 +51,7 @@ export const PomodoroContextProvider = (
         timerTaskId,
         sessionType,
         progress,
-    } = usePomo({ onTimesUp });
+    } = usePomo({ onComplete });
 
     const contextValue: PomodoroContextType = {
         stop,

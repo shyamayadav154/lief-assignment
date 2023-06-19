@@ -1,8 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 
+function showNotification(message: string) {
+    void Notification.requestPermission().then((perm) => {
+        if (perm === "granted") {
+            new Notification("To-Do Pomo", {
+                body: message,
+                icon: "/favicon.ico",
+            });
+        }
+    });
+}
+
 export type SessionType = "work" | "break" | "longBreak";
 
-const usePomodoro = ({ onTimesUp }: { onTimesUp: () => void }) => {
+const usePomodoro = ({ onComplete }: { onComplete: () => void }) => {
     const [sessionType, setSessionType] = useState<SessionType>("work");
     const [time, setTime] = useState(25 * 60); // Initial time set to 25 minutes
     const [timerTaskId, setTimerTaskId] = useState<string | null>(null);
@@ -11,7 +22,8 @@ const usePomodoro = ({ onTimesUp }: { onTimesUp: () => void }) => {
 
     const handleSessionComplete = useCallback(() => {
         if (sessionType === "work") {
-            onTimesUp();
+            onComplete();
+            showNotification("Time for a break!");
             if (sessionsCompleted === 3) {
                 setSessionType("longBreak");
                 setTime(15 * 60); // Long break set to 15 minutes
@@ -24,10 +36,11 @@ const usePomodoro = ({ onTimesUp }: { onTimesUp: () => void }) => {
                 );
             }
         } else {
+            showNotification("Time to get back to work!");
             setSessionType("work");
             setTime(25 * 60); // Work session set to 25 minutes
         }
-    }, [onTimesUp, sessionsCompleted, sessionType]);
+    }, [onComplete, sessionsCompleted, sessionType]);
 
     useEffect(() => {
         let timer: string | number | NodeJS.Timeout | undefined;
@@ -86,7 +99,7 @@ const usePomodoro = ({ onTimesUp }: { onTimesUp: () => void }) => {
         setIsRunning(true);
     };
 
-    const start= (taskId: string) => {
+    const start = (taskId: string) => {
         setIsRunning(true);
         setTimerTaskId(taskId);
     };
