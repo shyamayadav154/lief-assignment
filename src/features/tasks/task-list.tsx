@@ -71,14 +71,14 @@ type ButtonGroupProps = {
 
 const FilterButtonGroup = ({ setFilter, filter }: ButtonGroupProps) => {
     return (
-        <span className="isolate inline-flex rounded-md  text-sm">
+        <span className="isolate inline-flex text-gray-500 rounded-md  text-sm">
             <button
                 onClick={() => setFilter("all")}
                 type="button"
                 className={cn(
-                    "relative inline-flex items-center rounded-l-md bg-white px-3 py-2 text-sm  border hover:bg-gray-50 focus:z-10",
+                    "relative inline-flex  items-center rounded-l-md bg-white px-3 py-2   border hover:bg-gray-50 focus:z-10",
                     {
-                        "bg-gray-100": filter === "all",
+                        "bg-gray-100 text-gray-800": filter === "all",
                     },
                 )}
             >
@@ -88,9 +88,9 @@ const FilterButtonGroup = ({ setFilter, filter }: ButtonGroupProps) => {
                 onClick={() => setFilter("active")}
                 type="button"
                 className={cn(
-                    "relative -ml-px inline-flex items-center bg-white px-3 py-2 text-sm  border hover:bg-gray-50 focus:z-10",
+                    "relative -ml-px inline-flex items-center bg-white px-3 py-2 border hover:bg-gray-50 focus:z-10",
                     {
-                        "bg-gray-100": filter === "active",
+                        "bg-gray-100 text-gray-800": filter === "active",
                     },
                 )}
             >
@@ -100,9 +100,9 @@ const FilterButtonGroup = ({ setFilter, filter }: ButtonGroupProps) => {
                 onClick={() => setFilter("completed")}
                 type="button"
                 className={cn(
-                    "relative -ml-px inline-flex items-center rounded-r-md bg-white px-3 py-2 text-sm  border hover:bg-gray-50 focus:z-10",
+                    "relative -ml-px inline-flex items-center rounded-r-md bg-white px-3 py-2 border hover:bg-gray-50 focus:z-10",
                     {
-                        "bg-gray-100": filter === "completed",
+                        "bg-gray-100 text-gray-800": filter === "completed",
                     },
                 )}
             >

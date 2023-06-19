@@ -177,7 +177,7 @@ export const SingleStateCard = ({ name, stat }: SingleStateCardProps) => {
     );
 };
 export const StatsCards = ({ tasks }: { tasks: Task[] }) => {
-    const totalTasks = tasks.length - 1;
+    const totalTasks = tasks.length;
     const completedTasks = tasks.filter((task) => task.done).length;
     const activeTasks = totalTasks - completedTasks;
     const avgCompletionPercent = (completedTasks / totalTasks) * 100;

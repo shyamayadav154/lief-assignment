@@ -37,13 +37,10 @@ export const SingleTask = ({ task }: { task: Task }) => {
             reset();
             start(task.id);
         }
-
     };
     const closeTaskDetails = () => setIsEditTask(false);
     const openTaskDetails = () => {
-        if (isShowTimer) {
-            setIsShowTimer(false);
-        }
+        setIsShowTimer(false);
         setIsEditTask(true);
     };
 
@@ -54,32 +51,31 @@ export const SingleTask = ({ task }: { task: Task }) => {
         <ResizablePanel>
             <li className="border w-full flex gap-2.5 items-start rounded  p-2 bg-zinc-50">
                 <TaskCheckBox taskId={task.id} isChecked={task.done} />
-                <section
-                    onClick={openTaskDetails}
-                    className="cursor-pointer flex-1 select-none"
-                >
+                <section className="cursor-pointer flex-1 select-none">
                     {!isEditTask && (
-                        <article>
-                            <div className="text-lg">
+                        <article
+                            onClick={openTaskDetails}
+                        >
+                            <div className="">
                                 {task.title}
                             </div>
                             {!isShowTimer && (
-                                <div className="flex gap-2">
-                                    <div className="text-xs p-1 capitalize font-medium  border">
-                                        <ExclamationTriangleIcon className="h-3 w-3 inline mr-2" />
+                                <div className="flex gap-2 text-gray-500">
+                                    <div className="text-xs rounded p-1 capitalize font-medium bg-white  border">
+                                        <ExclamationTriangleIcon className="h-3 w-3 inline mr-1" />
                                         {task.priority?.toLowerCase()}
                                     </div>
-                                    <div className="text-xs flex items-center font-medium p-1 border">
-                                        <CalendarIcon className="h-3 w-3 inline mr-2" />
+                                    <div className="text-xs flex rounded items-center bg-white font-medium p-1 border">
+                                        <CalendarIcon className="h-3 w-3 inline mr-1" />
                                         {relativeDay(task.dueDate)}
                                     </div>
-                                    <div className="text-xs flex items-center font-medium p-1 border">
-                                        <TimerIcon className="h-3 w-3 inline mr-2" />
+                                    <div className="text-xs flex rounded items-center bg-white font-medium p-1 border">
+                                        <TimerIcon className="h-3 w-3 inline mr-1" />
                                         {task.tomatoes}
                                     </div>
                                     {task.category && (
-                                        <div className="text-xs flex items-center font-medium p-1 border">
-                                            <TagIcon className="h-3 w-3 inline mr-2" />
+                                        <div className="text-xs flex rounded bg-white items-center font-medium p-1 border">
+                                            <TagIcon className="h-3 w-3 inline mr-1" />
                                             {task.category}
                                         </div>
                                     )}
@@ -97,16 +93,16 @@ export const SingleTask = ({ task }: { task: Task }) => {
                         />
                     )}
                 </section>
-                <section>
-                    {(!isShowTimer || task.id !== timerTaskId) &&
+                <section className=" my-auto">
+                    {(!isEditTask && !showPomodoroTimer) &&
                         (
                             <Button
                                 onClick={onPlayClick}
-                                className="p-2 border bg-orange-100 rounded-full hover:bg-orange-200"
+                                className="p-2 border bg-orange-50 rounded-full hover:bg-orange-100"
                             >
                                 {hasTimerTaskId
-                                    ? <ClockIcon className="h-6 w-6 text-orange-500" />
-                                    : <PlayIcon className="h-6 w-6 text-orange-500" />}
+                                    ? <ClockIcon className="h-6 w-6 text-orange-400" />
+                                    : <PlayIcon className="h-6 w-6 text-orange-400" />}
                             </Button>
                         )}
                 </section>

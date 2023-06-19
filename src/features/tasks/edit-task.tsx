@@ -2,8 +2,6 @@ import { Loader2, TimerIcon } from "lucide-react";
 import { api, type RouterOutputs } from "~/utils/api";
 import { useState } from "react";
 
-
-
 import { Button } from "~/components/ui/button";
 import { type Priority } from "@prisma/client";
 import { useDebounce } from "react-use";
@@ -76,7 +74,6 @@ export const EditTask = ({ task, closeTaskDetails }: EditTaskProps) => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     type="text"
-                    className="text-xl"
                 />
             </div>
             <div className="grid grid-cols-2 gap-2 p-2 rouinded bg-white  items-center">
