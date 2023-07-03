@@ -32,11 +32,13 @@ function CreateTask() {
     const [title, setTitle] = useState("");
     const [dueDate, setDueDate] = useState<Date | undefined>();
     const [priority, setPriority] = useState<Priority | undefined>(undefined);
+    const [tomatoesToComplete, setTomatoesToComplete] = useState(3);
     const apiContext = api.useContext();
     const addTask = api.task.create.useMutation();
     const user = useUser();
 
-    const isButtonDisabled = addTask.status === "loading" || !title || !dueDate || !priority;
+    const isButtonDisabled = addTask.status === "loading" || !title || !dueDate ||
+        !priority;
 
     const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -59,6 +61,7 @@ function CreateTask() {
             dueDate,
             priority,
             title,
+            tomatoesToComplete,
         }, {
             onSuccess: () => {
                 setTitle("");
@@ -87,6 +90,15 @@ function CreateTask() {
             />
             <div className="flex flex-col sm:flex-row sm:justify-between gap-2.5">
                 <div className="flex justify-between gap-2.5">
+                    <Input
+                        type="number"
+                        name="tomatoes"
+                        placeholder="Tomatoes"
+                        className="w-[120px]"
+                        min={1}
+                        value={tomatoesToComplete}
+                        onChange={(e) => setTomatoesToComplete(parseInt(e.target.value))}
+                    />
                     <DatePicker
                         onChange={setDueDate}
                         value={dueDate}

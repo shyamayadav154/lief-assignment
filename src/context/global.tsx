@@ -1,4 +1,10 @@
-import { type Context, createContext, type ReactNode, useContext } from "react";
+import {
+    type Context,
+    createContext,
+    type ReactNode,
+    useContext,
+    useState,
+} from "react";
 import { api } from "~/utils/api";
 import usePomo, { type SessionType } from "~/hooks/use-pomo";
 
@@ -14,6 +20,9 @@ type PomodoroContextType = {
     stop: () => void;
     pause: () => void;
     progress: number;
+    sessionToComplete: number;
+    updateSessionToComplete: (value: number) => void;
+    sessionsCompleted: number;
 };
 
 export const PomodoroContext = createContext<PomodoroContextType | null>(null);
@@ -21,8 +30,13 @@ export const PomodoroContext = createContext<PomodoroContextType | null>(null);
 export const PomodoroContextProvider = (
     { children }: { children: ReactNode },
 ) => {
+    const [sessionToComplete, setSessionToComplete] = useState(3);
     const addTomatoApi = api.task.addTomato.useMutation();
     const apiContext = api.useContext();
+
+    const updateSessionToComplete = (value: number) => {
+        setSessionToComplete(value);
+    };
 
     const onComplete = () => {
         if (!timerTaskId) return alert("task id not found");
@@ -51,7 +65,8 @@ export const PomodoroContextProvider = (
         timerTaskId,
         sessionType,
         progress,
-    } = usePomo({ onComplete });
+        sessionsCompleted,
+    } = usePomo({ onComplete, sessionToComplete });
 
     const contextValue: PomodoroContextType = {
         stop,
@@ -65,6 +80,9 @@ export const PomodoroContextProvider = (
         sessionType,
         timerTaskId,
         isTimerRunning: isRunning,
+        sessionToComplete,
+        updateSessionToComplete,
+        sessionsCompleted,
     };
     return (
         <PomodoroContext.Provider

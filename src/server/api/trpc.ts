@@ -9,9 +9,21 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 import { prisma } from "~/server/db";
 import { getSession, type Session } from "@auth0/nextjs-auth0";
+
+export const userSchema = z.object({
+    nickname: z.string(),
+    name: z.string(),
+    picture: z.string(),
+    updated_at: z.string(),
+    email: z.string(),
+    email_verified: z.boolean(),
+    sub: z.string(),
+    sid: z.string(),
+});
+
 /**
  * 1. CONTEXT
  *
@@ -99,18 +111,19 @@ export const createTRPCRouter = t.router;
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-
+type User = z.infer<typeof userSchema>;
 const isAuthed = t.middleware(({ ctx, next }) => {
     if (!ctx.session || !ctx.session.user) {
         throw new TRPCError({
             code: "UNAUTHORIZED",
         });
     }
+    userSchema.parse(ctx.session.user);
     return next({
         ctx: {
             session: {
                 ...ctx.session,
-                user: ctx.session.user,
+                user: ctx.session.user as User,
             },
         },
     });

@@ -8,11 +8,13 @@ export const taskRouter = createTRPCRouter({
         title: z.string(),
         dueDate: z.date(),
         priority: z.nativeEnum(Priority),
+        tomatoesToComplete: z.number(),
     })).mutation(async ({ ctx, input }) => {
         const userId = ctx.session.user.email;
         if (!userId) {
             throw new TRPCError({
                 code: "UNAUTHORIZED",
+
                 message: "You must be logged in to create a task",
             });
         }
@@ -22,6 +24,7 @@ export const taskRouter = createTRPCRouter({
                 title: input.title,
                 dueDate: input.dueDate,
                 priority: input.priority,
+                tomatoes_to_complete: input.tomatoesToComplete,
             },
         });
     }),
@@ -124,6 +127,7 @@ export const taskRouter = createTRPCRouter({
     toggleStatus: protectedProcedure.input(z.object({
         taskId: z.string(),
     })).mutation(async ({ ctx, input }) => {
+        console.log(ctx, "....ctx....");
         const task = await ctx.prisma.task.findUnique({
             where: {
                 id: input.taskId,

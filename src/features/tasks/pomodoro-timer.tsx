@@ -27,6 +27,8 @@ export const PomodorTimer = (
         resume,
         stop,
         progress,
+        sessionToComplete,
+        sessionsCompleted,
     } = usePomodoroState();
 
     return (
@@ -62,8 +64,11 @@ export const PomodorTimer = (
                 </div>
 
                 <div className="relative w-[12.5rem]">
-                    <span className="absolute inset-0 grid place-content-center text-3xl font-semibold">
+                    <span className="absolute tabular-nums inset-0 grid place-content-center text-3xl font-semibold">
                         {formatTime(time)}
+                        <div className="mx-auto  text-base font-normal mt-2">
+                            {sessionsCompleted}/{sessionToComplete}
+                        </div>
                     </span>
                     <Circle
                         percent={progress}

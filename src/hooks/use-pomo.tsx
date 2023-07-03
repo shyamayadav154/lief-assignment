@@ -13,7 +13,12 @@ function showNotification(message: string) {
 
 export type SessionType = "work" | "break" | "longBreak";
 
-const usePomodoro = ({ onComplete }: { onComplete: () => void }) => {
+const usePomodoro = (
+    { onComplete, sessionToComplete = 3 }: {
+        onComplete: () => void;
+        sessionToComplete: number;
+    },
+) => {
     const [sessionType, setSessionType] = useState<SessionType>("work");
     const [time, setTime] = useState(25 * 60); // Initial time set to 25 minutes
     const [timerTaskId, setTimerTaskId] = useState<string | null>(null);
@@ -24,7 +29,7 @@ const usePomodoro = ({ onComplete }: { onComplete: () => void }) => {
         if (sessionType === "work") {
             onComplete();
             showNotification("Time for a break!");
-            if (sessionsCompleted === 3) {
+            if (sessionsCompleted === sessionToComplete) {
                 setSessionType("longBreak");
                 setTime(15 * 60); // Long break set to 15 minutes
                 setSessionsCompleted(0);
@@ -40,7 +45,7 @@ const usePomodoro = ({ onComplete }: { onComplete: () => void }) => {
             setSessionType("work");
             setTime(25 * 60); // Work session set to 25 minutes
         }
-    }, [onComplete, sessionsCompleted, sessionType]);
+    }, [onComplete, sessionsCompleted, sessionType, sessionToComplete]);
 
     useEffect(() => {
         let timer: string | number | NodeJS.Timeout | undefined;
@@ -116,6 +121,7 @@ const usePomodoro = ({ onComplete }: { onComplete: () => void }) => {
         stop,
         pause,
         start,
+        sessionsCompleted,
     };
 };
 

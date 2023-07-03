@@ -1,7 +1,7 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon, TagIcon, TimerIcon } from "lucide-react";
 import { api, type RouterOutputs } from "~/utils/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { PlayIcon } from "@heroicons/react/20/solid";
@@ -22,6 +22,7 @@ export const SingleTask = ({ task }: { task: Task }) => {
         timerTaskId,
         start,
         reset,
+        updateSessionToComplete,
     } = usePomodoroState();
 
     const onPlayClick = () => {
@@ -30,14 +31,17 @@ export const SingleTask = ({ task }: { task: Task }) => {
         const isCurrentTask = timerTaskId === task.id;
 
         if (!isTimerRunning && !isCurrentTask) {
+            updateSessionToComplete(task.tomatoes_to_complete);
             start(task.id);
         }
 
         if (isTimerRunning && !isCurrentTask) {
             reset();
+            updateSessionToComplete(task.tomatoes_to_complete);
             start(task.id);
         }
     };
+
     const closeTaskDetails = () => setIsEditTask(false);
     const openTaskDetails = () => {
         setIsShowTimer(false);
@@ -46,6 +50,12 @@ export const SingleTask = ({ task }: { task: Task }) => {
 
     const hasTimerTaskId = timerTaskId === task.id;
     const showPomodoroTimer = (!isEditTask && isShowTimer) && hasTimerTaskId;
+
+    useEffect(() => {
+        if (!hasTimerTaskId) {
+            setIsShowTimer(false);
+        }
+    }, [setIsShowTimer, hasTimerTaskId]);
 
     return (
         <ResizablePanel>
@@ -71,7 +81,7 @@ export const SingleTask = ({ task }: { task: Task }) => {
                                     </div>
                                     <div className="text-xs flex rounded items-center bg-white font-medium p-1 border">
                                         <TimerIcon className="h-3 w-3 inline mr-1" />
-                                        {task.tomatoes}
+                                        {task.tomatoes}/{task.tomatoes_to_complete}
                                     </div>
                                     {task.category && (
                                         <div className="text-xs flex rounded bg-white items-center font-medium p-1 border">
