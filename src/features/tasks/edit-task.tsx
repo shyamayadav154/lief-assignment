@@ -69,14 +69,13 @@ export const EditTask = ({ task, closeTaskDetails }: EditTaskProps) => {
             className="cursor-auto"
             onClick={(e) => e.stopPropagation()}
         >
-            <div className="bg-white mb-2">
                 <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     type="text"
+                    className="bg-white mb-2.5"
                 />
-            </div>
-            <div className="grid grid-cols-2 gap-2 p-2 rouinded bg-white  items-center">
+            <div className="grid grid-cols-2 rounded gap-2 p-2 rouinded bg-white  items-center">
                 <span className="text-gray-500">Priority</span>
                 <span className="capitalize">
                     <SelectMenu
@@ -110,7 +109,7 @@ export const EditTask = ({ task, closeTaskDetails }: EditTaskProps) => {
             </div>
             <textarea
                 rows={4}
-                className="w-full block col-span-2 mt-2 p-2 outline-none"
+                className="w-full block col-span-2 rounded mt-2 p-2 outline-none"
                 placeholder="Add description..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}

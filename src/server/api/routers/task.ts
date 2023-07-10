@@ -127,14 +127,12 @@ export const taskRouter = createTRPCRouter({
     toggleStatus: protectedProcedure.input(z.object({
         taskId: z.string(),
     })).mutation(async ({ ctx, input }) => {
-        console.log(ctx, "....ctx....");
         const task = await ctx.prisma.task.findUnique({
             where: {
                 id: input.taskId,
             },
         });
 
-        console.log("....task....", task);
         if (!task) {
             throw new TRPCError({
                 code: "NOT_FOUND",

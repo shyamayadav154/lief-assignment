@@ -11,12 +11,16 @@ import { Button } from "~/components/ui/button";
 import ResizablePanel from "~/components/ResizablePanel";
 import { EditTask } from "./edit-task";
 import { PomodorTimer } from "./pomodoro-timer";
+import clsx from "clsx";
+import { Checkbox } from "~/components/ui/checkbox";
+import { cn } from "~/lib/utils";
 
 type Task = RouterOutputs["task"]["getAll"][number];
 
 export const SingleTask = ({ task }: { task: Task }) => {
     const [isEditTask, setIsEditTask] = useState(false);
     const [isShowTimer, setIsShowTimer] = useState(false);
+    const apiContext = api.useContext();
     const {
         isTimerRunning,
         timerTaskId,
@@ -24,6 +28,31 @@ export const SingleTask = ({ task }: { task: Task }) => {
         reset,
         updateSessionToComplete,
     } = usePomodoroState();
+
+    const toggleStatus = api.task.toggleStatus.useMutation({
+        onMutate: async ({ taskId }) => {
+            await apiContext.task.getAll.cancel();
+            const prevData = apiContext.task.getAll.getData();
+            if (!prevData) return { prevData: undefined };
+            const oldTask = prevData.find((t) => t.id === taskId);
+            const newTask = { ...oldTask, done: !oldTask?.done };
+            apiContext.task.getAll.setData(undefined, (old) => {
+                if (!old) return old;
+                return old.map((t) => (t.id === taskId ? newTask : t));
+            });
+            return { prevData };
+        },
+        onError(error, variables, context) {
+            if (context?.prevData) {
+                apiContext.task.getAll.setData(undefined, context.prevData);
+            }
+        },
+    });
+    const onCheckboxChange = () => {
+        toggleStatus.mutate({
+            taskId: task.id,
+        });
+    };
 
     const onPlayClick = () => {
         setIsShowTimer(!isShowTimer);
@@ -52,6 +81,7 @@ export const SingleTask = ({ task }: { task: Task }) => {
     const showPomodoroTimer = (!isEditTask && isShowTimer) && hasTimerTaskId;
 
     useEffect(() => {
+        console.log(`runing for ${task.id}`);
         if (!hasTimerTaskId) {
             setIsShowTimer(false);
         }
@@ -60,13 +90,27 @@ export const SingleTask = ({ task }: { task: Task }) => {
     return (
         <ResizablePanel>
             <li className="border w-full flex gap-2.5 items-start rounded  p-2 bg-zinc-50">
-                <TaskCheckBox taskId={task.id} isChecked={task.done} />
-                <section className="cursor-pointer flex-1 select-none">
+                <Checkbox
+                    className={cn("rounded-full h-5 w-5 transition-colors", {
+                        "mt-1": !isEditTask,
+                        "mt-2.5": isEditTask,
+                    })}
+                    onCheckedChange={onCheckboxChange}
+                    checked={task.done}
+                />
+                <section className={cn("cursor-pointer flex-1 select-none")}>
                     {!isEditTask && (
                         <article
                             onClick={openTaskDetails}
+                            className={cn({
+                                "opacity-50 transition-colors duration-500": task.done,
+                            })}
                         >
-                            <div className="">
+                            <div
+                                className={clsx("transition-colors duration-500", {
+                                    "line-through text-gray-500": task.done,
+                                })}
+                            >
                                 {task.title}
                             </div>
                             {!isShowTimer && (
@@ -129,7 +173,7 @@ const TaskCheckBox = (
 
     const onCheckboxChange = () => {
         toggleStatus.mutate({ taskId }, {
-            onSuccess: () => {
+            onSettled: () => {
                 void apiContext.task.getAll.invalidate();
             },
         });
