@@ -32,12 +32,19 @@ export function dateRangeArray(startDate = dayjs(), endDate: Date) {
     return arr;
 }
 
-
 export const getChartOptions = (max: number): ChartOptions<"bar"> => ({
     responsive: true,
     scales: {
+        x: {
+            grid: {
+                display: false,
+            },
+        },
         y: {
             max,
+            grid: {
+                display: true,
+            },
             ticks: {
                 callback: (value) => value,
                 stepSize: 1,
@@ -62,5 +69,3 @@ export const getChartOptions = (max: number): ChartOptions<"bar"> => ({
         },
     },
 });
-
-
