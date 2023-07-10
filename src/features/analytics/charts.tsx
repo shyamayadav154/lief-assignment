@@ -44,7 +44,7 @@ const ChartTemplate = ({ dates, tasks }: ChartTemplateProps) => {
         const max = Math.max(
             ...dates.map((day) => taskCompletedOnThatDay(day, tasks)),
         );
-        return max + 2;
+        return max;
     }, [tasks, dates]);
 
     const options = getChartOptions(max);
@@ -56,13 +56,12 @@ const ChartTemplate = ({ dates, tasks }: ChartTemplateProps) => {
                 label: "Tasks Completed",
                 data: dates.map((day) => taskCompletedOnThatDay(day, tasks)),
                 backgroundColor: "#fb923c",
-                borderRadius:4,
             },
         ],
     };
 
     return (
-        <article className="rounded bg-white sm:p-5">
+        <article className="rounded-lg bg-white sm:p-5 shadow mt-5">
             <Bar height={"220"}  data={data} options={options} />
         </article>
     );

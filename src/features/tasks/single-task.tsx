@@ -114,7 +114,7 @@ export const SingleTask = ({ task }: { task: Task }) => {
                                 {task.title}
                             </div>
                             {!isShowTimer && (
-                                <div className="flex gap-2 text-gray-500">
+                                <div className="flex flex-wrap gap-2 text-gray-500">
                                     <div className="text-xs rounded p-1 capitalize font-medium bg-white  border">
                                         <ExclamationTriangleIcon className="h-3 w-3 inline mr-1" />
                                         {task.priority?.toLowerCase()}
@@ -151,6 +151,7 @@ export const SingleTask = ({ task }: { task: Task }) => {
                     {(!isEditTask && !showPomodoroTimer) &&
                         (
                             <Button
+                                disabled={task.done}
                                 onClick={onPlayClick}
                                 className="p-2 border bg-orange-50 flex-shrink-0 aspect-square rounded-full hover:bg-orange-100"
                             >
@@ -165,27 +166,4 @@ export const SingleTask = ({ task }: { task: Task }) => {
     );
 };
 
-const TaskCheckBox = (
-    { isChecked, taskId }: { isChecked: boolean; taskId: string },
-) => {
-    const toggleStatus = api.task.toggleStatus.useMutation();
-    const apiContext = api.useContext();
 
-    const onCheckboxChange = () => {
-        toggleStatus.mutate({ taskId }, {
-            onSettled: () => {
-                void apiContext.task.getAll.invalidate();
-            },
-        });
-    };
-    return (
-        <section className="mt-1.5">
-            <input
-                onChange={onCheckboxChange}
-                className="h-4 w-4"
-                type="checkbox"
-                defaultChecked={isChecked}
-            />
-        </section>
-    );
-};

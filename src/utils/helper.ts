@@ -41,7 +41,7 @@ export const getChartOptions = (max: number): ChartOptions<"bar"> => ({
             },
         },
         y: {
-            max,
+            max:max+1,
             grid: {
                 display: true,
             },
